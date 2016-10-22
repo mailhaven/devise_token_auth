@@ -10,7 +10,7 @@ module DeviseTokenAuth
 
     def create
       # Check
-      field = (resource_params.keys.map(&:to_sym) & resource_class.authentication_keys).first
+      field = authentication_key_field()
 
       @resource = nil
       if field
@@ -142,6 +142,14 @@ module DeviseTokenAuth
 
     def resource_params
       params.permit(*params_for_resource(:sign_in))
+    end
+
+    def authentication_key_field
+      key_params = resource_class.authentication_keys
+      key_params = key_params.keys if key_params.is_a?(Hash)
+      key_field  = (resource_params.keys.map(&:to_sym) & key_params).first
+
+      return key_field
     end
 
   end
