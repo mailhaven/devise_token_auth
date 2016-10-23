@@ -20,13 +20,14 @@ module DeviseTokenAuth
           q_value.downcase!
         end
 
-        q = "#{field.to_s} = ? AND provider='email'"
-
         if ActiveRecord::Base.connection.adapter_name.downcase.starts_with? 'mysql'
+          q = "#{field.to_s} = ? AND provider='#{default_provider}'"
           q = "BINARY " + q
+          @resource = resource_class.where(q, q_value).first
+        else
+          @resource = resource_class.where(provider: default_provider).
+                      find_for_database_authentication(login: q_value)
         end
-
-        @resource = resource_class.where(q, q_value).first
       end
 
       if @resource and valid_params?(field, q_value) and @resource.valid_password?(resource_params[:password]) and (!@resource.respond_to?(:active_for_authentication?) or @resource.active_for_authentication?)
@@ -150,6 +151,10 @@ module DeviseTokenAuth
       key_field  = (resource_params.keys.map(&:to_sym) & key_params).first
 
       return key_field
+    end
+
+    def default_provider
+      return 'email'
     end
 
   end
