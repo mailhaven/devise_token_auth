@@ -7,9 +7,11 @@ module DeviseTokenAuth
     # sending emails
     def create
       if ( field = authentication_key_field() ) && !resource_params[field]
-        return render_create_error_missing_auth_key
-      elsif !resource_params[:email]
-        return render_create_error_missing_email
+        if field.to_sym == :email
+          return render_create_error_missing_email
+        else
+          return render_create_error_missing_auth_key
+        end
       end
 
       # give redirect value from params priority
