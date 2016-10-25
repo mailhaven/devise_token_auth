@@ -5,18 +5,18 @@ module DeviseTokenAuth::Concerns::SetResourceByLogin
   
   def set_resource(field=nil)
     # Check
-    field ||= authentication_key_field()
+    @auth_field = ( field || authentication_key_field() )
 
     @resource = nil
-    if field
-      q_value = resource_params[field]
+    if @auth_field
+      q_value = resource_params[@auth_field]
 
-      if resource_class.case_insensitive_keys.include?(field)
+      if resource_class.case_insensitive_keys.include?(@auth_field)
         q_value.downcase!
       end
 
       if ActiveRecord::Base.connection.adapter_name.downcase.starts_with? 'mysql'
-        q = "#{field.to_s} = ? AND provider='#{default_provider}'"
+        q = "#{@auth_field.to_s} = ? AND provider='#{default_provider}'"
         q = "BINARY " + q
         @resource = resource_class.where(q, q_value).first
       else
