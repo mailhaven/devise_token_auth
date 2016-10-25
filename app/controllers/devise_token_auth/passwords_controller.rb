@@ -7,7 +7,7 @@ module DeviseTokenAuth
     # sending emails
     def create
       if ( field = authentication_key_field() ) && !resource_params[field]
-        return render_create_erorr_missing_auth_field
+        return render_create_error_missing_auth_key
       elsif !resource_params[:email]
         return render_create_error_missing_email
       end
@@ -147,10 +147,10 @@ module DeviseTokenAuth
       end
     end
 
-    def render_create_error_missing_auth_field
+    def render_create_error_missing_auth_key
       render json: {
         success: false,
-        errors: [I18n.t("devise_token_auth.passwords.missing_auth_field")]
+        errors: [I18n.t("devise_token_auth.passwords.missing_auth_key")]
       }, status: 401
     end
 

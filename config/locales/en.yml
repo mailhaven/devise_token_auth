@@ -16,6 +16,7 @@ en:
       user_not_found: "User not found."
     passwords:
       missing_email: "You must provide an email address."
+      missing_auth_key: "You must provide a valid authentication key."
       missing_redirect_url: "Missing redirect URL."
       not_allowed_redirect_url: "Redirect to '%{redirect_url}' not allowed."
       sended: "An email has been sent to '%{email}' containing instructions for resetting your password."
