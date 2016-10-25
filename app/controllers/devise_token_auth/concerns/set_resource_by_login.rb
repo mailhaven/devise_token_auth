@@ -1,11 +1,11 @@
-module DeviseTokenauth::Concerns::SetResourceByLogin
+module DeviseTokenAuth::Concerns::SetResourceByLogin
   extend ActiveSupport::Concern
 
   protected
   
-  def set_resource
+  def set_resource(field=nil)
     # Check
-    field = authentication_key_field()
+    field ||= authentication_key_field()
 
     @resource = nil
     if field

@@ -6,7 +6,9 @@ module DeviseTokenAuth
     # this action is responsible for generating password reset tokens and
     # sending emails
     def create
-      unless resource_params[:email]
+      if ( field = authentication_key_field() ) && !resource_params[field]
+        return render_create_erorr_missing_auth_field
+      elsif !resource_params[:email]
         return render_create_error_missing_email
       end
 
@@ -27,21 +29,23 @@ module DeviseTokenAuth
         end
       end
 
-      # honor devise configuration for case_insensitive_keys
-      if resource_class.case_insensitive_keys.include?(:email)
-        @email = resource_params[:email].downcase
-      else
-        @email = resource_params[:email]
-      end
+      set_resource(field)
 
-      q = "uid = ? AND provider='email'"
+      # # honor devise configuration for case_insensitive_keys
+      # if resource_class.case_insensitive_keys.include?(:email)
+      #   @email = resource_params[:email].downcase
+      # else
+      #   @email = resource_params[:email]
+      # end
 
-      # fix for mysql default case insensitivity
-      if ActiveRecord::Base.connection.adapter_name.downcase.starts_with? 'mysql'
-        q = "BINARY uid = ? AND provider='email'"
-      end
+      # q = "uid = ? AND provider='email'"
 
-      @resource = resource_class.where(q, @email).first
+      # # fix for mysql default case insensitivity
+      # if ActiveRecord::Base.connection.adapter_name.downcase.starts_with? 'mysql'
+      #   q = "BINARY uid = ? AND provider='email'"
+      # end
+
+      # @resource = resource_class.where(q, @email).first
 
       @errors = nil
       @error_status = 400
@@ -141,6 +145,13 @@ module DeviseTokenAuth
       else
         "update_with_password"
       end
+    end
+
+    def render_create_error_missing_auth_field
+      render json: {
+        success: false,
+        errors: [I18n.t("devise_token_auth.passwords.missing_auth_field")]
+      }, status: 401
     end
 
     def render_create_error_missing_email
