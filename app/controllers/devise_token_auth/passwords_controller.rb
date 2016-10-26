@@ -54,12 +54,7 @@ module DeviseTokenAuth
 
       if @resource
         yield @resource if block_given?
-        @resource.send_reset_password_instructions({
-          email: @email,
-          provider: 'email',
-          redirect_url: @redirect_url,
-          client_config: params[:config_name]
-        })
+        @resource.send_reset_password_instructions(reset_password_opts)
 
         if @resource.errors.empty?
           return render_create_success
@@ -241,6 +236,15 @@ module DeviseTokenAuth
 
     def password_resource_params
       params.permit(*params_for_resource(:account_update))
+    end
+
+    def reset_password_opts
+      return {
+        email: @email,
+        provider: 'email',
+        redirect_url: @redirect_url,
+        client_config: params[:config_name]
+      }
     end
 
   end
